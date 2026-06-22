@@ -1,0 +1,19 @@
+{
+  "name": "coding-club-backend",
+  "version": "1.0.0",
+  "description": "APIs for CC website usage",
+  "main": "index.js",
+  "scripts": {
+    "test": "run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodingClub-SATI/Coding-club-backend.git"
+  },
+  "author": "Aashutosh Singh Baghel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CodingClub-SATI/Coding-club-backend/issues"
+  },
+  "homepage": "https://github.com/CodingClub-SATI/Coding-club-backend#readme"
+}
