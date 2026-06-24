@@ -9,7 +9,7 @@ for i in {0..9}; do
 		-H "Content-Type: application/json" \
 		-d '{
         }'
-		echo -e "\n Tried registering dummy member: $i"
+		echo -e "\n Tried removing dummy member: $i"
 	sleep 0
 done
 elapsed_time=$(( SECONDS - start_time ))
