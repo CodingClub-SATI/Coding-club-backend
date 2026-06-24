@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "NODE_ENV=production node --env-file=.env index.js",
-		"dev": "NODE_ENV=development nodemon --exec \"node --env-file=.env.dev\" index.js"
+    "dev": "NODE_ENV=development nodemon --exec \"node --env-file=.env.dev\" index.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/CodingClub-SATI/Coding-club-backend#readme",
   "dependencies": {
+    "cors": "^2.8.6",
     "express": "^5.2.1",
     "mongoose": "^9.7.1"
   },

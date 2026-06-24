@@ -17,14 +17,19 @@ const memberSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	email:{
+		type: String,
+		required: true,
+		unique: true
+	},
+	image:{
+		type: String
+	},
 	socials:{
-		email:{
-			type: String,
-			required: true
-		},
 		linkedin: String,
 		github: String
-	}
+	},
+	tags: [String]
 })
 
 export default mongoose.model('member', memberSchema);

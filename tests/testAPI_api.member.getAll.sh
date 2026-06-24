@@ -1,6 +1,6 @@
 #!/bin/bash
 # Use this script to benchmark "/api/member/fetchall".
-API_URL="http://localhost:8000/api/member/fetchall"
+API_URL="http://localhost:3000/api/members"
 echo "Running tests on $API_URL"
 start_time=$SECONDS
 for i in {0..0}; do

@@ -1,23 +1,24 @@
 #!/bin/bash
 # Use this script to benchmark "/api/member/create" creation handling.
-API_URL="http://localhost:8000/api/member/create"
+API_URL="http://localhost:3000/api/members/"
 echo "Running tests on $API_URL"
 start_time=$SECONDS
 for i in {0..5}; do
-	curl -s -i -X POST $API_URL \
+    email="testmember${i}@example.com"
+	curl -s -i -X POST {$API_URL}{$email} \
 		-H "Content-Type: application/json" \
-		-d "{\
-            \"name\":\"testuser\",
-            \"branch\":\"CSE\",
-            \"year\":2029,
-            \"clubPost\":\"tech team member\",
-            \"socials\":{
-                \"email\":\"test${i}_$(date +%s%N)@example.com\",
-                \"github\":\"sdadS\",
-                \"linkedin\":\"asdasd\"
-            } \
-        }"
-		echo -e "\nTried registering dummy member: $i"
+		-d '{
+            "name":"testuser",
+            "branch":"CSE",
+            "year":2029,
+            "clubPost":"tech team member",
+            "socials":{
+                "github":"sdadS",
+                "linkedin":"asdasd"
+            },
+            "tags":["ui","ux"]
+        }'
+		echo     -e "\nTried registering dummy member: $i"
 	sleep 0
 done
 elapsed_time=$(( SECONDS - start_time ))

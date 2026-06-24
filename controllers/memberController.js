@@ -2,15 +2,15 @@ import Member from "../models/memberModel.js"
 
 export const create = async(req, res)=>{
     try {
-        const member = new Member(req.body);
-        const email = member.socials?.email;
+        const email = req.params.email;
         if (!email) {
             return res.status(400).json({message: "Email is required"});
         }
-        const memberExist = await Member.findOne({"socials.email":email});
+        const memberExist = await Member.findOne({ email });
         if (memberExist){
             return res.status(400).json({message: "member already exists"});
         }
+        const member = new Member({...req.body, email});
         const savedMember = await member.save();
         console.log("saved", email);
         return res.status(201).json(savedMember);
@@ -31,12 +31,13 @@ export const fetch = async(req, res)=>{
 
 export const update = async (req, res) => {
     try {
-        const email = req.body.socials?.email;
+        const email = req.params.email;
         if (!email) {
             return res.status(400).json({message: "Email is required"});
         }
+        req.body.email=email;
         const updatedMember = await Member.findOneAndUpdate(
-            { "socials.email": email },
+            { email },
             req.body,
             {
                 returnDocument: "after",
@@ -54,12 +55,12 @@ export const update = async (req, res) => {
 };
 export const remove = async (req, res) => {
     try {
-        const email = req.body.socials?.email;
+        const email = req.params.email;
         if (!email) {
             return res.status(400).json({message: "Email is required"});
         }
         const removedMember = await Member.findOneAndDelete({
-            "socials.email": email
+            "email": email
         });
         if (!removedMember) {
             return res.status(404).json({message: "Member does not exist"});
