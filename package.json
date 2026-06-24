@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
-    "dev": "NODE_ENV=development nodemon --exec \"node --env-file=.env.dev\" index.js"
+    "start": "NODE_ENV=production node --env-file=.env index.js",
+		"dev": "NODE_ENV=development nodemon --exec \"node --env-file=.env.dev\" index.js"
   },
   "repository": {
     "type": "git",
