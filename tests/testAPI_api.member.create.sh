@@ -5,20 +5,21 @@ echo "Running tests on $API_URL"
 start_time=$SECONDS
 for i in {0..5}; do
     email="testmember${i}@example.com"
-	curl -s -i -X POST {$API_URL}{$email} \
+	curl -s -i -X POST $API_URL \
 		-H "Content-Type: application/json" \
-		-d '{
-            "name":"testuser",
-            "branch":"CSE",
-            "year":2029,
-            "clubPost":"tech team member",
-            "socials":{
-                "github":"sdadS",
-                "linkedin":"asdasd"
+		-d "{
+            \"name\":\"testuser\",
+            \"email\":\"$email\",
+            \"branch\":\"CSE\",
+            \"year\":2029,
+            \"clubPost\":\"tech team member\",
+            \"socials\":{
+                \"github\":\"sdadS\",
+                \"linkedin\":\"asdasd\"
             },
-            "tags":["ui","ux"]
-        }'
-		echo     -e "\nTried registering dummy member: $i"
+            \"tags\":[\"ui\",\"ux\"]
+        }"
+		echo -e "\nTried registering dummy member: $i"
 	sleep 0
 done
 elapsed_time=$(( SECONDS - start_time ))
