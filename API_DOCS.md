@@ -1,6 +1,6 @@
 #This file shall contain info about API's provided by the server and their respective parameters.
 
-POST /api/members/$email:	#email is passed as parameter in url
+POST /api/members:
 	Input:
 		-H "Content-Type: application/json" \
     	-d '{

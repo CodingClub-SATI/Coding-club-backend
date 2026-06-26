@@ -1,7 +1,6 @@
 //One shot function to map console.log,error to a void function if env is 'production'
 if (process.env.NODE_ENV === "production") {
     console.log = () => {};
-	console.error = () => {};
 }
 
 import express from "express";
@@ -14,7 +13,7 @@ app.use(express.json());
 app.use("/api", route);
 
 const corsOptions = {
-  origin: ['http://localhost:3000'],
+  origin: ['http://localhost:5173', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type']
 };

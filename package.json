@@ -18,6 +18,9 @@
     "url": "https://github.com/CodingClub-SATI/Coding-club-backend/issues"
   },
   "homepage": "https://github.com/CodingClub-SATI/Coding-club-backend#readme",
+  "engines": {
+    "node": ">=20.6.0"
+  },
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
