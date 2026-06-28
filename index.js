@@ -6,11 +6,13 @@ if (process.env.NODE_ENV === "production") {
 import express from "express";
 import mongoose from "mongoose";
 import route from "./routes/memberRoutes.js";
+import uploadRoute from "./routes/uploadRoute.js";
 import cors from "cors";
 
 const app = express();
 app.use(express.json());
 app.use("/api", route);
+app.use("/api", uploadRoute)
 
 const corsOptions = {
   origin: ['http://localhost:5173', 'http://localhost:3000'],

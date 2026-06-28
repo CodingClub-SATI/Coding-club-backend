@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import z from "zod";
 
 const memberSchema = new mongoose.Schema({
 	name:{
@@ -32,4 +33,14 @@ const memberSchema = new mongoose.Schema({
 	tags: [String]
 })
 
-export default mongoose.model('member', memberSchema);
+export const Member = mongoose.model('member', memberSchema);
+
+export const updateMemberSchema = z.object({
+  name: z.string().optional(),
+  branch: z.string().optional(),
+  year: z.number().optional(),
+  clubPost: z.string().optional(),
+  email: z.string().email().optional(),
+  socials: z.any().optional(),
+  tags: z.array(z.string()).optional()
+}).strict();
