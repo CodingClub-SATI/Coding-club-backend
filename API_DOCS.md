@@ -59,3 +59,24 @@ PUT /api/members/$email:
 		Failed [Internal Server error]: http code 500
 		Failed [Member not found]: http code 404
 		Failed [Email not provided]: http code 400
+
+POST /api/upload/$email:
+	Input:
+		-H "Content-Type: application/json" \
+		-F "image=@/path/to/file" \
+		-d '{}'
+	Output:
+		Success: http code 200
+		Failed [Internal Server error]: http code 500
+		Failed [Member not found]: http code 404
+		Failed [Email not provided]: http code 400
+
+DELETE /api/upload/$email:
+	Input:
+		-H "Content-Type: application/json" \
+		-d '{}'
+	Output:
+		Success: http code 200
+		Failed [Internal Server error]: http code 500
+		Failed [Member not found]: http code 404
+		Failed [Email not provided]: http code 400

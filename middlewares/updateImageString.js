@@ -47,6 +47,10 @@ export const removeImageString = async (req, res, next) => {
 
 export const getUserImage = async (req, res, next) => {
     try {
+        const { email } = req.params.email;
+        if (!email) {
+            return res.status(400).json({message: "Email is required"});
+        }
         const member = await Member.findOne({ email: req.params.email });
         if (!member) {
             return res.status(404).json({

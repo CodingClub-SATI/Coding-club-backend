@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { uploadImage, removeImage } from "../controllers/catboxImageController.js";
-import { verifyMemberExistence } from "../middlewares/userExistence.js";
+import { verifyMemberExistence } from "../middlewares/memberExistence.js";
 import { updateImageString, removeImageString, getUserImage } from "../middlewares/updateImageString.js";
 
 const uploadRoute = express.Router();
