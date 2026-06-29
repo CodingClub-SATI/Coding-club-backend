@@ -1,8 +1,8 @@
 import express from "express";
 import multer from "multer";
-import { uploadImage } from "../controllers/catboxImageController.js";
+import { uploadImage, removeImage } from "../controllers/catboxImageController.js";
 import { verifyMemberExistence } from "../middlewares/userExistence.js";
-import { updateImageString, removeImageString } from "../middlewares/updateImageString.js";
+import { updateImageString, removeImageString, getUserImage } from "../middlewares/updateImageString.js";
 
 const uploadRoute = express.Router();
 const upload = multer({
@@ -13,6 +13,6 @@ const upload = multer({
 });
 
 uploadRoute.post("/upload/:email", verifyMemberExistence, upload.single("image"), uploadImage, updateImageString);
-uploadRoute.delete("/upload/:email", verifyMemberExistence, removeImageString);
+uploadRoute.delete("/upload/:email", getUserImage, removeImage, removeImageString);
 
 export default uploadRoute;

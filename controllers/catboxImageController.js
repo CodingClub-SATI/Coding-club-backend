@@ -4,7 +4,7 @@ import { Readable } from "node:stream";
 import { Member, updateMemberSchema } from "../models/memberModel.js";
 
 export const uploadImage = async (req, res, next) => {
-    const catbox = new Catbox('b7664761da43c0a691df4ebac');
+    const catbox = new Catbox(process.env.CATBOX_USERHASH);
     try{
         if (!req.file) {
             return res.status(400).json({
@@ -61,6 +61,20 @@ export const uploadImage = async (req, res, next) => {
     }
 };
 
-export const deleteImage = async (req, res) => {
-
+export const removeImage = async (req, res, next) => {
+    try {
+        const catbox = new Catbox(process.env.CATBOX_USERHASH);
+        const imageUrl = req.imageUrl;
+        //url are of the form https://files.catbox.moe/atzkoi.jpg
+        //node-catbox wants the "atzkoi.jpg"
+        const filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+        await catbox.deleteFiles({
+            files: [filename],
+        });
+        next();
+    } catch (err) {
+        return res.status(500).json({
+            message: err.message,
+        });
+    }
 }
