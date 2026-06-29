@@ -1,4 +1,4 @@
-import Member from "../models/memberModel.js"
+import { Member, updateMemberSchema } from "../models/memberModel.js"
 
 export const create = async(req, res)=>{
     try {
