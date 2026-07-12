@@ -1,6 +1,6 @@
 #!/bin/bash
-# Use this script to benchmark "/api/upload" creation handling.
-API_URL="http://localhost:3000/api/upload/"
+# Use this script to benchmark "/api/upload/member" creation handling.
+API_URL="http://localhost:3000/api/upload/member/"
 echo "Running tests on $API_URL"
 start_time=$SECONDS
 for i in {0..8}; do

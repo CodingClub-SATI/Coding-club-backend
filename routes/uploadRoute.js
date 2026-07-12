@@ -1,8 +1,10 @@
 import express from "express";
 import multer from "multer";
 import { uploadImage, removeImage } from "../controllers/catboxImageController.js";
-import { verifyMemberExistence } from "../middlewares/memberExistence.js";
-import { updateImageString, removeImageString, getUserImage } from "../middlewares/updateImageString.js";
+import { verifyMemberExistence, verifyEventExistence } from "../middlewares/checkExistence.js";
+import { updateMemberImageString, removeMemberImageString, getMemberImageString } from "../middlewares/updateImageString.js";
+import { updateEventImageString, removeEventImageString, getEventImageString } from "../middlewares/updateImageString.js";
+import { validateEventAsset } from "../middlewares/paramterValidate.js";
 
 const uploadRoute = express.Router();
 const upload = multer({
@@ -12,7 +14,12 @@ const upload = multer({
     }
 });
 
-uploadRoute.post("/upload/:email", verifyMemberExistence, upload.single("image"), uploadImage, updateImageString);
-uploadRoute.delete("/upload/:email", getUserImage, removeImage, removeImageString);
+uploadRoute.post("/upload/member/:email", verifyMemberExistence, upload.single("avatar"), uploadImage, updateMemberImageString);
+uploadRoute.delete("/upload/member/:email", getMemberImageString, removeImage, removeMemberImageString);
+
+
+uploadRoute.post("/upload/event/:id/:asset(logoURL|bannerURL)", verifyEventExistence, upload.single("image"), uploadImage, updateEventImageString);
+uploadRoute.delete("/upload/event/:id/:asset(logoURL|bannerURL)", getEventImageString, removeImage, removeEventImageString);
 
 export default uploadRoute;
+

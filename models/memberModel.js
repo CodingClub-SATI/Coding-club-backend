@@ -21,7 +21,8 @@ const memberSchema = new mongoose.Schema({
 	email:{
 		type: String,
 		required: true,
-		unique: true
+		unique: true,
+		trim: true
 	},
 	image:{
 		type: String
@@ -41,6 +42,9 @@ export const updateMemberSchema = z.object({
   year: z.number().optional(),
   clubPost: z.string().optional(),
   email: z.string().email().optional(),
-  socials: z.any().optional(),
+  socials: z.object({
+	linkedin: z.string().optional(),
+	github: z.strict().optional()
+  }).optional(),
   tags: z.array(z.string()).optional()
 }).strict();

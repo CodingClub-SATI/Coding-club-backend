@@ -36,3 +36,6 @@ mongoose.connect(MONGODBHANDLE).then(()=>{
 app.get("/ping", (req, res) => {
 	res.send("pong");
 });
+app.use((req, res) => {
+  res.status(404).send('Invalid route parameter value.');
+});
