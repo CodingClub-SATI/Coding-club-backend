@@ -1,4 +1,4 @@
-import Event, { updateEventSchema } from "../models/eventModel.js";
+import { Event, updateEventSchema } from "../models/eventModel.js";
 
 export const create = async (req, res) => {
     try {
@@ -25,9 +25,14 @@ export const create = async (req, res) => {
 
 export const fetch = async (req, res) => {
     try {
-        const events_list = await Event.find().exec();
-        return res.json(events_list);
-    } catch (error) {
+        if (req.query.includeArchived){
+            const all_events_list = await Event.find().exec();
+            return res.status(200).json(all_events_list);
+        } else {
+            const events_list = await Event.find({archived: true}).exec();
+            return res.status(200).json(events_list);
+        }
+        } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal Server Error" });
     }

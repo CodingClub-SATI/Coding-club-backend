@@ -44,7 +44,7 @@ export const updateMemberSchema = z.object({
   email: z.string().email().optional(),
   socials: z.object({
 	linkedin: z.string().optional(),
-	github: z.strict().optional()
+	github: z.string().optional()
   }).optional(),
   tags: z.array(z.string()).optional()
 }).strict();

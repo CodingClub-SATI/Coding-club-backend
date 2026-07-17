@@ -26,7 +26,7 @@ export const create = async(req, res)=>{
 export const fetch = async(req, res)=>{
     try {
         const members_list = await Member.find().exec();
-        return res.json(members_list);
+        return res.status(200).json(members_list);
     } catch (error) {
         console.error(error);
         return res.status(500).json({error: "Internal Server Error"});
