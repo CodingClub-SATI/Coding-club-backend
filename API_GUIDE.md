@@ -69,7 +69,9 @@ GET /api/events:
 	>>>     (admin/store.js → toggleEventArchived), which is correct as-is.
 
 POST /api/events:
-	Input: eventObject (see above, minus id)
+	Input: eventObject (see above, minus id) //ID needs to be provided manually now: (2 Event Initials + event year)
+											//Example: CodeCrack 2026 will get ID: CC2026
+											//Or Recruitment Drive 2026 gets RD2026
 	Output:
 		Success: input payload + generated id + http code 201
 		Failed [Validation error]: http code 400
@@ -98,9 +100,9 @@ GET /api/gallery:
 			albumObject: {
 			id:{ type:Number, required:true },
 			title:{ type:String, required:true },
-			date:{ type:String },
-			cover:{ type:String },
-			imageCount:{ type:Number },
+			date:{ type:String },		// Why is this required though? The date i mean
+			cover:{ type:String },		//Again, why si this required??? Can't this be done more quickly in the frontend
+			imageCount:{ type:Number }, // Same question.
 			images: [ { id:Number, src:String, caption:String, featured:Boolean } ]
 		}
 		Failed [Internal server error]: http code 500
