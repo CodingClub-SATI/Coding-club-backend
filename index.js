@@ -6,9 +6,15 @@ if (process.env.NODE_ENV === "production") {
 import express from "express";
 import mongoose from "mongoose";
 import route from "./routes/memberRoutes.js";
-import uploadRoute from "./routes/uploadRoute.js";
 import cors from "cors";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import rateLimit from "express-rate-limit";
+import uploadRoute from "./routes/uploadRoute.js";
 import { handleControllerError } from "./utils/errorHandler.js";
+import { runStartupChecks } from "./utils/startupChecks.js";
+
+runStartupChecks();
 
 const app = express();
 
@@ -19,37 +25,74 @@ if (Number.isInteger(trustProxyHops) && trustProxyHops >= 0) {
     app.set("trust proxy", trustProxyHops);
 }
 
+app.use(helmet());
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 200,
+    message: "Too many requests from this IP, please try again later."
+});
+app.use("/api/", apiLimiter);
 app.use(express.json());
-app.use("/api", route);
-app.use("/api", uploadRoute)
+app.use(cookieParser());
+
+const defaultDevOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+const configuredOrigins = process.env.FRONTEND_URLS
+    ? process.env.FRONTEND_URLS.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+
+if (process.env.NODE_ENV === "production" && configuredOrigins.length === 0) {
+    console.warn(
+        "WARNING: FRONTEND_URLS is not set in production. CORS will only " +
+        "allow the local dev origins, so the deployed frontend's requests " +
+        "will be blocked by the browser."
+    );
+}
 
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type']
+    origin: configuredOrigins.length > 0 ? configuredOrigins : defaultDevOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true // Required for HttpOnly cookies to pass through
 };
 app.use(cors(corsOptions));
+
+const allowedOrigins = new Set(corsOptions.origin);
+const STATE_CHANGING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+app.use("/api", (req, res, next) => {
+    const origin = req.headers.origin;
+    if (STATE_CHANGING_METHODS.has(req.method) && origin && !allowedOrigins.has(origin)) {
+        return res.status(403).json({ message: "Request origin not allowed." });
+    }
+    next();
+});
+
+// Routes
+app.use("/api", route);
+app.use("/api", uploadRoute);
 
 const PORT = process.env.PORT || 3000;
 const MONGODBHANDLE = process.env.MONGO_URL;
 
-mongoose.connect(MONGODBHANDLE).then(()=>{
-	console.log("DB Connected successfully");
-	app.listen(PORT, ()=>{
-		console.log(`server running on port :${PORT}`);
-	});
-	})
-	.catch(console.error);
+mongoose.connect(MONGODBHANDLE).then(() => {
+    console.log("DB Connected successfully");
+    app.listen(PORT, () => {
+        console.log(`server running on port :${PORT}`);
+    });
+}).catch((err) => {
+    console.error("Failed to connect to MongoDB:", err);
+    process.exit(1);
+});
 
-//Most basic ping command to test server up/down status
+// Most basic ping command to test server up/down status
 app.get("/ping", (req, res) => {
-	res.send("pong");
+    res.send("pong");
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).send('Invalid route parameter value.');
-});
+    res.status(404).json({ message: "Invalid route parameter value." });
 
 app.use((err, req, res, next) => {
     const status = err.status || err.statusCode;
@@ -57,4 +100,5 @@ app.use((err, req, res, next) => {
         return res.status(status).json({ message: err.message || "Bad request." });
     }
     return handleControllerError(err, res, { context: "Unhandled error" });
+});
 });

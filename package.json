@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node --env-file=.env index.js",
-    "dev": "nodemon --exec \"node --env-file=.env.dev\" index.js"
+    "dev": "nodemon --exec node --env-file=.env.dev index.js"
   },
   "repository": {
     "type": "git",
@@ -22,11 +22,17 @@
     "node": ">=20.6.0"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.1",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.1",
     "multer": "^2.2.0",
     "node-catbox": "^4.2.0",
+    "nodemailer": "^9.0.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
