@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import route from "./routes/memberRoutes.js";
 import uploadRoute from "./routes/uploadRoute.js";
 import cors from "cors";
+import { handleControllerError } from "./utils/errorHandler.js";
 
 const app = express();
 
@@ -44,6 +45,16 @@ mongoose.connect(MONGODBHANDLE).then(()=>{
 app.get("/ping", (req, res) => {
 	res.send("pong");
 });
+
+// 404 handler
 app.use((req, res) => {
   res.status(404).send('Invalid route parameter value.');
+});
+
+app.use((err, req, res, next) => {
+    const status = err.status || err.statusCode;
+    if (typeof status === "number" && status >= 400 && status < 500) {
+        return res.status(status).json({ message: err.message || "Bad request." });
+    }
+    return handleControllerError(err, res, { context: "Unhandled error" });
 });
