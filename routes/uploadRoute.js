@@ -18,8 +18,8 @@ uploadRoute.post("/upload/member/:email", verifyMemberExistence, upload.single("
 uploadRoute.delete("/upload/member/:email", getMemberImageString, removeImage, removeMemberImageString);
 
 
-uploadRoute.post("/upload/event/:id/:asset(logoURL|bannerURL)", verifyEventExistence, upload.single("image"), uploadImage, updateEventImageString);
-uploadRoute.delete("/upload/event/:id/:asset(logoURL|bannerURL)", getEventImageString, removeImage, removeEventImageString);
+uploadRoute.post("/upload/event/:id/:asset", validateEventAsset, verifyEventExistence, upload.single("image"), uploadImage, updateEventImageString);
+uploadRoute.delete("/upload/event/:id/:asset", validateEventAsset, getEventImageString, removeImage, removeEventImageString);
 
 export default uploadRoute;
 

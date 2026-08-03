@@ -1,5 +1,5 @@
 import { Member } from "../models/memberModel.js";
-import { Event } from "../models/eventModel.js";
+import Event from "../models/eventModel.js";
 
 export const verifyMemberExistence = async (req, res, next) => {
     try {

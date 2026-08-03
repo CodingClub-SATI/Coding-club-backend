@@ -1,5 +1,5 @@
 import { Member } from "../models/memberModel.js";
-import { Event } from "../models/eventModel.js";
+import Event from "../models/eventModel.js";
 import { updateMemberSchema } from "../models/memberModel.js";
 
 export const updateMemberImageString = async (req, res) => {
