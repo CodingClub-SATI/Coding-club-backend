@@ -5,14 +5,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "NODE_ENV=production node --env-file=.env index.js",
-    "dev": "NODE_ENV=development nodemon --exec \"node --env-file=.env.dev\" index.js"
+    "start": "node --env-file=.env index.js",
+    "dev": "nodemon --exec \"node --env-file=.env.dev\" index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CodingClub-SATI/Coding-club-backend.git"
   },
-  "author": "Aashutosh Singh Baghel",
+  "author": "Coding Club SATI",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/CodingClub-SATI/Coding-club-backend/issues"
@@ -24,7 +24,6 @@
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "form-data": "^4.0.6",
     "mongoose": "^9.7.1",
     "multer": "^2.2.0",
     "node-catbox": "^4.2.0",

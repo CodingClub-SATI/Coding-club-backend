@@ -10,6 +10,14 @@ import uploadRoute from "./routes/uploadRoute.js";
 import cors from "cors";
 
 const app = express();
+
+const trustProxyHops = process.env.TRUST_PROXY_HOPS !== undefined
+    ? Number.parseInt(process.env.TRUST_PROXY_HOPS, 10)
+    : undefined;
+if (Number.isInteger(trustProxyHops) && trustProxyHops >= 0) {
+    app.set("trust proxy", trustProxyHops);
+}
+
 app.use(express.json());
 app.use("/api", route);
 app.use("/api", uploadRoute)
@@ -21,7 +29,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const MONGODBHANDLE = process.env.MONGO_URL;
 
 mongoose.connect(MONGODBHANDLE).then(()=>{
