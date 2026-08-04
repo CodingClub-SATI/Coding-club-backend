@@ -1,80 +1,58 @@
-// import FormData from "form-data";
-import { Catbox } from 'node-catbox';
+import { Catbox } from "node-catbox";
 import { Readable } from "node:stream";
-import { Member, updateMemberSchema } from "../models/memberModel.js";
+import { handleControllerError } from "../utils/errorHandler.js";
+
+const catbox = new Catbox(process.env.CATBOX_USERHASH);
+
+function extractCatboxFilename(imageUrl) {
+    return imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+}
 
 export const uploadImage = async (req, res, next) => {
-    const catbox = new Catbox(process.env.CATBOX_USERHASH);
-    try{
-        if (!req.file) {
-            return res.status(400).json({
-                message: "No image uploaded.",
-            });
-        }
-        console.log(req.file);
-        const stream = Readable.from([req.file.buffer]);
-        console.log("Before upload");
-        const imageUrl = await catbox.uploadFileStream({
-            stream,
-            filename: req.file.originalname,
-        });
-        console.log("After upload");
-        req.imageUrl = imageUrl;
-        next();
-    }
-    /*
     try {
         if (!req.file) {
             return res.status(400).json({
                 message: "No image uploaded.",
             });
         }
-        const form = new FormData();
-        form.append("reqtype", "fileupload");
-        form.append("userhash", process.env.CATBOX_USERHASH);
-        form.append("fileToUpload", req.file.buffer, {
+        const stream = Readable.from([req.file.buffer]);
+        const imageUrl = await catbox.uploadFileStream({
+            stream,
             filename: req.file.originalname,
-            contentType: req.file.mimetype,
         });
-        const { data } = await axios.post(
-            "https://catbox.moe/user/api.php",
-            form,
-            {
-                headers: form.getHeaders(),
-            }
-        );
-        const imageUrl = data.trim();
-        //Will make this generic in future for events+members uploading.
-        //Currently I can't be arsed to make this for both.
-        //Fuck it, we ball
         req.imageUrl = imageUrl;
-        return res.status(200).json({
-            imageUrl,
-            member,
-        });
-    
-    } */catch (err) {
-        console.error(err.response?.data || err);
-        return res.status(500).json({
-            message: "Failed to upload image.",
-        });
+        next();
+    } catch (err) {
+        console.error("Catbox upload failed:", err.response?.data || err);
+        return handleControllerError(err, res, { context: "Error uploading image to Catbox" });
     }
 };
 
 export const removeImage = async (req, res, next) => {
     try {
-        const catbox = new Catbox(process.env.CATBOX_USERHASH);
-        const imageUrl = req.imageUrl;
-        //url are of the form https://files.catbox.moe/atzkoi.jpg
-        //node-catbox wants the "atzkoi.jpg"
-        const filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
         await catbox.deleteFiles({
-            files: [filename],
+            files: [extractCatboxFilename(req.imageUrl)],
         });
         next();
     } catch (err) {
-        return res.status(500).json({
-            message: err.message,
-        });
+        return handleControllerError(err, res, { context: "Error deleting image from Catbox" });
     }
+};
+
+export function deleteImagesFromCatboxBestEffort(imageUrls) {
+    const files = [...new Set((imageUrls || []).filter(Boolean))].map(extractCatboxFilename);
+    if (files.length === 0) return;
+
+    catbox
+        .deleteFiles({ files })
+        .catch((err) => {
+            console.error(
+                "Failed to delete image(s) from Catbox (non-fatal):",
+                err.response?.data || err.message
+            );
+        });
+}
+
+export function deleteImageFromCatboxBestEffort(imageUrl) {
+    deleteImagesFromCatboxBestEffort([imageUrl]);
 }

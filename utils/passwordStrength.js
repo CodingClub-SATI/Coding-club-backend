@@ -1,3 +1,7 @@
+// Mirrors the scoring in frontend `src/features/setting/constants.js`
+// (getPasswordStrength) so the server enforces the same bar the UI
+// advertises, rather than trusting the client to have checked it.
+
 export const PASSWORD_MIN_LENGTH = 8;
 export const MIN_STRENGTH_SCORE = 3;
 

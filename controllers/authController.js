@@ -68,7 +68,7 @@ export const logout = async (req, res) => {
 };
 
 export const verifySession = (req, res) => {
-    return res.status(200).json({ valid: true });
+    return res.status(200).json({ valid: true, username: req.adminUsername });
 };
 
 export const requestOtp = async (req, res) => {

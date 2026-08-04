@@ -23,3 +23,15 @@ login() {
         exit 1
     fi
 }
+
+create_test_event() {
+    curl -s -X POST "$API_URL/events" \
+        -b "$COOKIE_JAR" \
+        -H "Content-Type: application/json" \
+        -d "{\"title\":\"Upload test fixture event $$-$(date +%s%N)\",\"type\":\"Workshop\",\"status\":\"upcoming\"}" \
+    | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>process.stdout.write(String(JSON.parse(d).id)))"
+}
+
+delete_test_event() {
+    curl -s -o /dev/null -X DELETE "$API_URL/events/$1" -b "$COOKIE_JAR"
+}

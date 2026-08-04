@@ -5,14 +5,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node --env-file=.env index.js",
+    "start": "node --env-file-if-exists=.env index.js",
     "dev": "nodemon --exec node --env-file=.env.dev index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CodingClub-SATI/Coding-club-backend.git"
   },
-  "author": "Coding Club SATI",
+  "author": "Coding club SATI",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/CodingClub-SATI/Coding-club-backend/issues"
@@ -37,8 +37,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
-  },
-  "imports": {
-    "#/*.js": "./*.js"
   }
 }

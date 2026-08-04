@@ -1,81 +1,70 @@
-import { Member, updateMemberSchema } from "../models/memberModel.js"
+import { TeamMember, Batch, Leadership } from "../models/teamModel.js";
+import { toSetUpdate } from "../utils/updateHelpers.js";
+import { deleteImageFromCatboxBestEffort } from "./catboxImageController.js";
+import { createHandler, updateHandler, removeHandler } from "../utils/crudHandlers.js";
 
-export const create = async(req, res)=>{
-    try {
-        const { email } = req.body;
-        if (!email) {
-            return res.status(400).json({message: "Email is required"});
+// ADMIN ROUTES: MEMBERS
+export const addMember = createHandler(TeamMember, {
+    context: "Error adding member",
+    duplicateMessage: "That member already exists",
+    validate: async (req) => {
+        const batchExists = await Batch.exists({ batch: req.body.batch });
+        if (!batchExists) {
+            return { status: 400, message: `Batch '${req.body.batch}' does not exist. Create it first.` };
         }
-        const memberExist = await Member.findOne({ email }).exec();
-        if (memberExist){
-            return res.status(400).json({message: "member already exists"});
-        }
-        const member = new Member(req.body);
-        const savedMember = await member.save();
-        console.log("saved", email);
-        return res.status(201).json(savedMember);
-    } catch (error) {
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ error: error.message });
-        }
-        console.error(error);
-        return res.status(500).json({error: "Internal Server Error"});
-    }
-}
+    },
+});
 
-export const fetch = async(req, res)=>{
-    try {
-        const members_list = await Member.find().exec();
-        return res.json(members_list);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({error: "Internal Server Error"});
-    }
-}
-
-export const update = async (req, res) => {
-    try {
-        const email = req.params.email;
-        if (!email) {
-            return res.status(400).json({message: "Email is required"});
-        }
-        req.body.email=email;
-        const updatedMember = await Member.findOneAndUpdate(
-            { email },
-            req.body,
-            {
-                returnDocument: "after",
-                runValidators: true
+export const updateMember = updateHandler(TeamMember, {
+    notFoundMessage: "Member not found",
+    context: "Error updating member",
+    duplicateMessage: "That member already exists",
+    validate: async (req) => {
+        if (req.body.batch) {
+            const batchExists = await Batch.exists({ batch: req.body.batch });
+            if (!batchExists) {
+                return { status: 400, message: `Batch '${req.body.batch}' does not exist. Create it first.` };
             }
-        ).exec();
-        if (!updatedMember) {
-            return res.status(404).json({message: "Member does not exist"});
         }
-        return res.status(200).json(updatedMember);
-    } catch (error) {
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ error: error.message });
+    },
+    beforeUpdate: (req) => (
+        req.body.avatarUrl !== undefined
+            ? TeamMember.findOne({ id: req.params.id }).select("avatarUrl").lean().exec()
+            : null
+    ),
+    buildUpdate: (req) => toSetUpdate(req.body),
+    afterUpdate: (updated, req, previousMember) => {
+        if (previousMember?.avatarUrl && previousMember.avatarUrl !== req.body.avatarUrl) {
+            deleteImageFromCatboxBestEffort(previousMember.avatarUrl);
         }
-        console.error(error);
-        return res.status(500).json({error: "Internal Server Error"});
-    }
-};
+    },
+});
 
-export const remove = async (req, res) => {
+export const removeMember = removeHandler(TeamMember, {
+    notFoundMessage: "Member not found",
+    context: "Error removing member",
+    onRemoved: async (removed) => {
+        deleteImageFromCatboxBestEffort(removed.avatarUrl);
+        await cleanupLeadershipReferences(removed.id);
+    },
+    respond: (removed, res) => res.status(200).json({ message: "Member removed successfully" }),
+});
+
+async function cleanupLeadershipReferences(memberId) {
     try {
-        const email = req.params.email;
-        if (!email) {
-            return res.status(400).json({message: "Email is required"});
+        const leadershipDoc = await Leadership.findOne({ singleton: "globalLeadership" }).lean().exec();
+        if (!leadershipDoc) return;
+
+        const update = { $pull: { convenors: memberId, coConvenors: memberId } };
+
+        const unsetOps = {};
+        for (const [dept, id] of Object.entries(leadershipDoc.departmentHeads || {})) {
+            if (id === memberId) unsetOps[`departmentHeads.${dept}`] = "";
         }
-        const removedMember = await Member.findOneAndDelete({
-            "email": email
-        }).exec();
-        if (!removedMember) {
-            return res.status(404).json({message: "Member does not exist"});
-        }
-        return res.status(200).json(removedMember);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({error: "Internal Server Error"});
+        if (Object.keys(unsetOps).length > 0) update.$unset = unsetOps;
+
+        await Leadership.updateOne({ singleton: "globalLeadership" }, update);
+    } catch (err) {
+        console.error("Failed to clean up leadership references for removed member (non-fatal):", err);
     }
-};
+}

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import z from "zod";
-import { hideMongoInternals } from "#/utils/schemaPlugins.js";
-import { hashPassword } from "#/utils/password.js";
+import { hideMongoInternals } from "../utils/schemaPlugins.js";
+import { hashPassword } from "../utils/password.js";
 
 const adminSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
@@ -21,6 +21,7 @@ adminSchema.pre("save", async function hashSensitiveFields() {
     if (this.isModified("otp") && this.otp) {
         this.otp = await hashPassword(this.otp);
     }
+    // Mongoose automatically moves on when this async function finishes
 });
 
 hideMongoInternals(adminSchema);

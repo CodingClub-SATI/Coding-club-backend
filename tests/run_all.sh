@@ -1,5 +1,5 @@
 #!/bin/bash
-# Runs every self-contained *.sh script and prints a summary.
+# Runs every self-contained API_test_*.sh script and prints a summary.
 #
 # Note: every script here just prints raw HTTP responses for you to read
 
@@ -24,6 +24,12 @@ if ! curl -s -o /dev/null -w "" --fail "$BASE_URL/ping"; then
 fi
 
 NEEDS_ARGS=(
+    "events/API_test_update.sh"
+    "events/API_test_remove.sh"
+    "gallery/API_test_album_update.sh"
+    "gallery/API_test_album_remove.sh"
+    "projects/API_test_update.sh"
+    "projects/API_test_remove.sh"
 )
 
 is_skipped() {
@@ -62,5 +68,11 @@ echo "API scripts: ${#passed[@]} ok, ${#failed[@]} failed"
 if [ "${#failed[@]}" -gt 0 ]; then
     printf 'FAILED: %s\n' "${failed[@]}"
 fi
+
+echo
+echo "Not run automatically (need ids from their paired create.sh — run e.g.:"
+echo "  events/API_test_create.sh, note the ids, then"
+echo "  events/API_test_update.sh <id...> and events/API_test_remove.sh <id...>):"
+printf '  %s\n' "${NEEDS_ARGS[@]}"
 
 [ "${#failed[@]}" -eq 0 ] && [ "$unit_failed" -eq 0 ]
