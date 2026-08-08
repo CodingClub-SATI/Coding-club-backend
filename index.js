@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import { handleControllerError } from "./utils/errorHandler.js";
 import { runStartupChecks } from "./utils/startupChecks.js";
+import { seedAdmin } from "./utils/seedAdmin.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
@@ -86,8 +87,9 @@ app.use("/api", contactInfoRoutes)
 const PORT = process.env.PORT || 3000;
 const MONGODBHANDLE = process.env.MONGO_URL;
 
-mongoose.connect(MONGODBHANDLE).then(() => {
+mongoose.connect(MONGODBHANDLE).then(async () => {
     console.log("DB Connected successfully");
+    await seedAdmin();
     app.listen(PORT, () => {
         console.log(`server running on port :${PORT}`);
         startGithubSyncJob();
