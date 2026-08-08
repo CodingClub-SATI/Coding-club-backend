@@ -12,6 +12,7 @@ import authRoutes from "./routes/authRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import galleryRoutes from "./routes/galleryRoutes.js";
+import uploadRoute from "./routes/uploadRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import updateRoutes from "./routes/updateRoutes.js";
@@ -79,6 +80,7 @@ app.use("/api", eventRoutes);
 app.use("/api", projectRoutes);
 app.use("/api", galleryRoutes);
 app.use("/api", teamRoutes);
+app.use("/api", uploadRoute);
 app.use("/api", contactRoutes);
 app.use("/api", updateRoutes);
 app.use("/api", statsRoutes);
@@ -107,7 +109,7 @@ app.get("/ping", (req, res) => {
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({ message: "Invalid route parameter value." });
-
+});
 
 app.use((err, req, res, next) => {
     const status = err.status || err.statusCode;
@@ -115,5 +117,4 @@ app.use((err, req, res, next) => {
         return res.status(status).json({ message: err.message || "Bad request." });
     }
     return handleControllerError(err, res, { context: "Unhandled error" });
-});
 });
